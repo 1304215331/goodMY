@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="../../../英雄联盟/css链接/chushihua.css">
+    <style>
+        .zong-a {
+            width: 800px;
+            height: 450px;
+            margin: 100px auto;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dahezi {
+            position: absolute;
+            width: 600%;
+            height: 100%;
+        }
+
+        .dahezi img {
+            width: 800px;
+            height: 100%;
+            float: left;
+        }
+
+        .zong-a ul {
+            position: absolute;
+            bottom: 10px;
+            left: 500px;
+        }
+
+        .zong-a ul li {
+            float: left;
+            padding: 5px 10px;
+            border: 1px solid #ffffff;
+            text-align: center;
+            margin-right: 10px;
+            color: #ffffff;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .zong-a ul li:hover {
+            background-color: pink;
+        }
+
+        .left,
+        .right {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            margin: auto;
+            width: 50px;
+            height: 50px;
+            color: blue;
+            font-size: 24px;
+            background-color: rgba(255, 255, 255, .5);
+            text-align: center;
+            line-height: 50px;
+            cursor: pointer;
+            display: none;
+            border: 1px solid #fff;
+            color: yellow;
+        }
+
+        .right {
+            right: 0;
+        }
+
+        .pink {
+            background-color: pink;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="zong-a">
+        <div class="dahezi">
+            <img src="./images/1.jpg" alt="">
+            <img src="./images/2.jpg" alt="">
+            <img src="./images/3.jpg" alt="">
+            <img src="./images/4.jpg" alt="">
+            <img src="./images/5.jpg" alt="">
+            <img src="./images/1.jpg" alt="">
+        </div>
+        <ul>
+            <li class="pink">1</li>
+            <li>2</li>
+            <li>3</li>
+            <li>4</li>
+            <li>5</li>
+        </ul>
+        <div class="left">
+            <</div> <div class="right">>
+        </div>
+    </div>
+    <script>
+
+
+        //  获取元素 
+        var zong = document.querySelector(".zong-a"); // 整个轮播图的父盒子
+        var dahezi = document.querySelector(".dahezi"); // 包含图片的父盒子
+        var imgwidth = dahezi.children[0].offsetWidth; // img的长度
+        var ul = document.querySelector("ul"); // ul
+        var lis = document.querySelectorAll("li"); // li 标签们
+        var left = document.querySelector(".left"); // 左箭头
+        var right = document.querySelector(".right") // 右箭头
+        var nun = 0;
+        /*  onmouseenter  ： 鼠标经过事件
+            onmouseleave  ： 鼠标离开事件*/
+
+        // 当鼠标经过整个盒子的时候需要执行的代码
+        zong.addEventListener("mouseenter", function () {
+            left.style.display = "block"
+            right.style.display = "block"
+            clearInterval(ting)
+        })
+        // 当鼠标离开整个盒子的时候需要执行的代码
+        zong.addEventListener("mouseleave", function () {
+            left.style.display = "none"
+            right.style.display = "none" 
+            ting = setInterval(function () {
+            right.click()
+            }, 3000)
+        })
+
+        // 当鼠标点击右箭头需要执行的代码
+        right.addEventListener("click", function () {
+            // 无线轮播 欺骗客服
+            if (nun == dahezi.children.length - 1) {
+                nun = 0
+                dahezi.style.left = 0
+            }
+            nun++
+            add(dahezi, -nun * imgwidth)
+            page()
+        })
+        // 当鼠标点击左箭头需要执行的代码
+        left.addEventListener("click", function () {
+            // 无线轮播 欺骗客服
+            if (nun == 0) {
+                nun = dahezi.children.length - 1
+                dahezi.style.left = -nun * imgwidth + "px"
+            }
+            nun--
+            add(dahezi, -nun * imgwidth)
+            page()
+        })
+
+        // 光标事件
+        for (var i = 0; i < lis.length; i++) {
+            lis[i].addEventListener("click", function () {
+                for (var j = 0; j < lis.length; j++) {
+                    lis[j].className = ""
+                }
+                this.className = "pink"
+                var nun = (this.innerHTML) - 1
+                add(dahezi, -nun * imgwidth)
+            })
+        }
+
+        // 光标跟随事件
+        var page = function () {
+            for (var i = 0; i < lis.length; i++) {
+                lis[i].className = ""
+            }
+            if (nun == dahezi.children.length - 1) {
+                lis[0].className = "pink"
+            } else {
+                lis[nun].className = "pink"
+            }
+        }
+    </script>
+</body>
+
+</html>

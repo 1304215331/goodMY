@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <!-- <link rel="stylesheet" href="../../../英雄联盟/css链接/chushihua.css"> -->
+    <style>
+        .zong-a {
+            width: 800px;
+            height: 450px;
+            margin: 100px auto;
+            position: relative;
+            /* overflow: hidden; */
+        }
+
+        .dahezi {
+            position: absolute;
+            width: 600%;
+            height: 100%;
+        }
+
+        .dahezi img {
+            width: 800px;
+            height: 100%;
+            float: left;
+        }
+
+        .zong-a ul {
+            position: absolute;
+            bottom: 10px;
+            left: 500px;
+        }
+
+        .zong-a ul li {
+            float: left;
+            padding: 5px 10px;
+            border: 1px solid #ffffff;
+            text-align: center;
+            margin-right: 10px;
+            color: #ffffff;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .zong-a ul li:hover {
+            background-color: pink;
+        }
+
+        .left,
+        .right {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            margin: auto;
+            width: 50px;
+            height: 50px;
+            color: blue;
+            font-size: 24px;
+            background-color: rgba(255, 255, 255, .5);
+            text-align: center;
+            line-height: 50px;
+            cursor: pointer;
+            display: none;
+            border: 1px solid #fff;
+            color: yellow;
+        }
+
+        .right {
+            right: 0;
+        }
+
+        .pink {
+            background-color: pink;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="zong-a">
+        <div class="dahezi">
+            <img src="./images/1.jpg" alt="">
+            <img src="./images/2.jpg" alt="">
+            <img src="./images/3.jpg" alt="">
+            <img src="./images/4.jpg" alt="">
+            <img src="./images/5.jpg" alt="">
+            <img src="./images/1.jpg" alt="">
+        </div>
+        <ul>
+            <li class="pink">1</li>
+            <li>2</li>
+            <li>3</li>
+            <li>4</li>
+            <li>5</li>
+        </ul>
+        <div class="left">
+            <</div> <div class="right">>
+        </div>
+    </div>
+
+
+    <script>
+        window.onload = function () {
+
+            //  变量右键头和左箭头  
+            var left = document.querySelector(".left"); // 左箭头
+            var right = document.querySelector(".right"); // 右箭头
+            var zong = document.querySelector(".zong-a") // 盒子
+
+            // 添加自动播放功能
+            var tine = setInterval(function () {
+                right.click();
+            }, 2000);
+
+            // 鼠标经过盒子的时候   箭头显示
+            zong.onmouseenter = function () {
+                left.style.display = "block"
+                right.style.display = "block"
+                clearInterval(tine);
+            }
+            // 鼠标离开盒子的时候   箭头隐藏
+            zong.onmouseleave = function () {
+                left.style.display = "none"
+                right.style.display = "none"
+                tine = setInterval(function () {
+                    right.click();
+                }, 2000);
+            }
+
+
+            // 当右箭头被点击的时候
+            var ul = document.querySelector(".dahezi"); // 变量储存图片的大盒子
+            var nun = 0; // 变量索引号
+            var img = ul.children[0].offsetWidth;
+
+
+            right.onclick = function () {
+                // 无缝链接
+                if (nun == ul.children.length - 1) { // 判断 如果单点击到最后一张  瞬间跳到第一张
+                    nun = 0;
+                    ul.style.left = 0
+                }
+                nun++
+                Myhanshu(ul, -(nun * img))
+                page()
+            }
+
+            // 当左箭头被点击的时候
+            left.onclick = function () {
+                if (nun == 0) { // 判断 如果是第一张  瞬间跳到最后一张
+                    nun = ul.children.length - 1;
+                    ul.style.left = -nun * img + "px"
+                }
+                nun--
+                Myhanshu(ul, -(nun * img))
+                page()
+
+            }
+
+            // 小点点
+            var lis = document.querySelectorAll("ul > li"); // 获取到五个小点点
+
+            for (var i = 0; i < lis.length; i++) {
+                lis[i].onclick = function () {
+                    for (var j = 0; j < lis.length; j++) {
+                        lis[j].className = "";
+                    }
+                    this.className = "pink";
+
+                    nun = (this.innerHTML) - 1;
+                    Myhanshu(ul, -(nun * img))
+                }
+            }
+
+
+            //  页码保持同步（当前显示的是第几张图片，下方页码对应索引高亮）
+            var page = function () {
+                for (let i = 0; i < lis.length; i++) {
+                    lis[i].className = '';
+                }
+                if (nun == img.length - 1 || nun == 5) {
+                    lis[0].className = 'pink';
+                } else {
+                    lis[nun].className = 'pink';
+                }
+            }
+            //  封装函数   obj  =   盒子    width =  移动到的地方
+            function Myhanshu(obj, width) {
+                //   先停止一次计时器
+                clearInterval(obj.jishi);
+                //  创建计时器
+                obj.jishi = setInterval(function () {
+                    // 吧盒子距离左边的距离变量出来
+                    var objWidch = obj.offsetLeft
+
+                    // 判断  如果需要走的长度 <= 已走的长度  就会往右走
+                    if (objWidch < width) {
+                        var box = 10;
+                    };
+                    if (objWidch > width) {
+                        var box = -10;
+                    }
+                    objWidch += box;
+                    obj.style.left = objWidch + "px";
+
+                    // 边界判断
+                    if (box > 0 ? objWidch >= width : objWidch <= width) {
+                        // 强行让元素到达目标位置
+                        obj.style.left = width + "px";
+                        clearInterval(obj.jishi);
+
+                    }
+                }, 10)
+            }
+
+        }
+
+    </script>
+</body>
+
+</html>

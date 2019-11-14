@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+      div {
+          position: absolute;
+          width: 200px;
+          height: 200px;
+          background-color: pink;
+          z-index: 1;
+      }
+      
+      p { 
+          left: 0;
+          top: 300px;
+          position: absolute;
+          width: 400px;
+          height: 400px;
+          background-color: green;
+      }
+
+    </style>
+</head>
+<body>
+      <div></div>
+  <p></p>
+      <script>
+         //  缓冲动画原理   (目标值 -  现在的位置) / 10
+
+       var div =   document.querySelector("div");
+       var p =document.querySelector("p")
+          function  donghua(obj,width){
+              clearInterval(obj.ting)
+         obj.ting =  setInterval(function(){
+            var huang = Math.ceil((width - obj.offsetLeft)/20)
+              if(obj.offsetLeft == width){
+                  clearTimeout(obj.ting)
+              };
+              obj.style.left = obj.offsetLeft + huang + "px"
+          },15)
+       }
+
+       donghua(div,1000);
+       donghua(p,1200);
+      
+      </script>
+</body>
+</html>

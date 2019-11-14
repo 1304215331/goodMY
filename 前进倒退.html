@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+      div {
+          position: absolute;
+          width: 200px;
+          height: 200px;
+          background-color: pink;
+          z-index: 1;
+      }
+      
+     
+
+    </style>
+</head>
+<body>
+       <button>点我前进500</button>
+       <button>点我前进800</button>
+      <div></div>
+ 
+      <script>
+         //  缓冲动画原理   (目标值 -  现在的位置) / 10
+         // 原理  : 因为除以十的原因  的到的是小数  所以要取整  
+        //   正数 向上取整Math.ceil()      负数  向下取整   Math.floor()
+        
+
+       var div =   document.querySelector("div");
+      var p =document.querySelector("p")
+       function  donghua(obj,width,huidiao){  // 这是一个封装函数   第三个参数为回调函数
+                 clearTimeout(obj.ting);
+              obj.ting =  setInterval(function(){
+            var huang = (width - obj.offsetLeft)/10 // 缓冲动画
+            var huang = huang>0 ?Math.ceil(huang):Math.floor(huang); // 判断是正数还是负数 
+              if(obj.offsetLeft == width){
+                  clearTimeout(obj.ting)
+                  // ***  重点  回调函数 一点要写这个 不然执行不了
+                  if(huidiao){ // 之所以写在这里  是应该等动画结束之后 如果有个参数就调用  如果没有就不掉用
+                    huidiao()
+                  }
+              };
+              obj.style.left = obj.offsetLeft + huang + "px"
+          },15)
+       }
+
+         var btn = document.querySelectorAll("button");
+
+         btn[0].addEventListener("click",function(){
+              donghua(div,500,function(){
+                   div.style.backgroundColor = "red"
+              })
+         });
+         btn[1].addEventListener("click",function(){
+              donghua(div,800,function(){
+                   div.style.backgroundColor = "green"
+               
+              })
+         });
+      </script>
+</body>
+</html>

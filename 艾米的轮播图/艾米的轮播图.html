@@ -1,0 +1,266 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>05-自动轮播</title>
+    <style type="text/css">
+        * {
+            margin: 0;
+            padding: 0;
+            border: none;
+            box-sizing: border-box;
+            font-family: 'Microsoft Yahei';
+            font-size: 62.5%;
+        }
+
+        ul,
+        li {
+            list-style: none;
+        }
+
+        .container {
+            position: relative;
+            width: 800px;
+            height: 450px;
+            margin: 100px auto;
+            overflow: hidden;
+        }
+
+        .container>.pic {
+            position: absolute;
+            left: 0;
+            width: 4800px;
+            height: 450px;
+        }
+
+        .container>.pic>img {
+            float: left;
+            width: 800px;
+        }
+
+        .container>ul {
+            position: absolute;
+            right: 5%;
+            bottom: 1%;
+        }
+
+        .container>ul>li {
+            float: left;
+            margin-right: 5px;
+            padding: 5px 10px;
+            background: rgba(255, 255, 255, .5);
+            border: 1px solid #ffffff;
+            cursor: pointer;
+        }
+
+        .container>ul>li:hover,
+        .container>ul>li.active {
+            background: #ffffff;
+        }
+
+        .container>span {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            display: none;
+            width: 50px;
+            height: 50px;
+            margin: auto;
+            background: rgba(255, 255, 255, .5);
+            border: 1px solid #ffffff;
+            font-family: 'heiti';
+            font-size: 3rem;
+            text-align: center;
+            line-height: 45px;
+            color: #ffffff;
+            cursor: pointer;
+        }
+
+        .container>.left {
+            left: 0;
+        }
+
+        .container>.right {
+            right: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="pic">
+            <img src="images/1.jpg">
+            <img src="images/2.jpg">
+            <img src="images/3.jpg">
+            <img src="images/4.jpg">
+            <img src="images/5.jpg">
+            <img src="images/1.jpg">
+        </div>
+        <ul>
+            <li class="active">1</li>
+            <li>2</li>
+            <li>3</li>
+            <li>4</li>
+            <li>5</li>
+        </ul>
+        <span class="left">&lt;</span>
+        <span class="right">&gt;</span>
+    </div>
+</body>
+<script type="text/javascript" src="js/animation.js"></script>
+<script type="text/javascript">
+    /*
+        第一步：完成轮播图事件的添加
+            1. 用一个全局变量 index 记录当前需要展示的图片的索引
+            2. 鼠标移入图片轮播视觉范围时显示左右箭头，移除时隐藏
+            3. 左右箭头按钮注册点击事件，在事件中修改当前索引 index，索引 index 表示的是当前应该展示第几张图片
+                3.1 点击左边箭头（显示前一张图片）：index --
+                3.2 点击右边箭头（显示后一张图片）：index ++
+            4. 页码注册点击事件
+        第二步：完成左右箭头控制图片轮播的效果
+            1. 点击移动之前给图片容器添加边界检测（否则不断点击同一个箭头就会无限向一个方向滚动）
+            2. 移动图片容器（目标距离 = -图片轮播视觉范围的宽度 * index）
+            3. 页码保持同步（当前显示的是第几张图片，下方页码对应索引高亮）
+        第三步：完成无限轮播，核心思想：n + 1
+            1. 常规思路：图片滚动时，当滚动到最后一张时，我们偷偷的快速改变图片容器的位置到第一张（不要动画，瞬间改变）
+                1.1 方法
+                    * wrap.style.left = '0px'; // 图片容器回到初始位置
+                    * index = 0; // 索引 index 恢复到 0
+                1.2 问题发现：这种方式可以实现无限轮播，但是在进入下一轮轮播的时候第一张会被跳过去
+                1.3 原因：我们手动改变了 index 为 0，而动画又需要 index + 1，所以会错过 index 为 0 的那一张
+            2. 解决方案
+                2.1 思路：我们在最后一张图片的后面加上第一张图片（第6张）可以让用户看到滚动效果，然后滚动到第六张时，再改变图片容器回到初始位置。
+                2.2 好处：
+                    * 用户可以看到滚动效果，不影响体验
+                    * 刚好第6张与第一张是同一张图片，快速改变位置不会造成动画的闪现
+            3. 当图片 index 为最后一张的的时候，页码应该让第一个高亮，因为最后一张图片和第一张图片是同一张
+        第四步：完成点击页码实现轮播
+            1. 点击的是第几个页码，移动动画的目标距离 = -图片轮播视觉范围的宽度 * index
+            2. 页码的下标需要与图片下标index保持一致，否则会产生冲突
+            3. 利用 index 改变页码样式
+        第五步：自动轮播
+            1. 功能原理：每隔一段时间自动轮播到下一页
+            2. 思路分析：
+                2.1 将轮播代码封装成一个函数
+                2.2 开启计时器，每隔一段时间执行这个函数
+                2.3 当鼠标进入到图片轮播视觉范围的时候，关闭计时器，让图片轮播进入手动模式，移除的时候再次进入自动轮播模式
+    */
+
+    // 0. 获取元素
+    var pic = document.querySelector('.pic');
+    var lis = document.querySelectorAll('li');
+    var arrowLeft = document.querySelector('.left');
+    var arrowRight = document.querySelector('.right');
+
+    // 1. 定义一个全局变量 index，用于记录当前是第几张图片
+    var index = 0;
+
+    var timeID = setInterval('nextPic()', 3000);
+
+    // 2. 鼠标移入图片轮播视觉范围时显示左右箭头，移除时隐藏
+    pic.parentNode.onmouseover = function () {
+        arrowLeft.style.display = 'block';
+        arrowRight.style.display = 'block';
+        // 当鼠标进入图片轮播视觉范围的时候，应该清楚计时器，让轮播图进入手动模式
+        clearInterval(timeID);
+    }
+    pic.parentNode.onmouseout = function () {
+        arrowLeft.style.display = 'none';
+        arrowRight.style.display = 'none';
+        // 当鼠标离开图片轮播视觉范围的时候，应该恢复自动轮播模式
+        timeID = setInterval('nextPic()', 3000);
+    }
+
+    /*
+        3. 左右箭头按钮注册点击事件，在事件中修改当前索引 index，索引 index 表示的是当前应该展示第几张图片
+            3.1 点击左边箭头（显示前一张图片）：index --
+            3.2 点击右边箭头（显示后一张图片）：index ++
+    */
+    arrowLeft.onclick = function () {
+        if (index == 0) {
+            // 让图片元素瞬间到达最后位置
+            index = pic.children.length - 1;
+            pic.style.left = -pic.parentNode.offsetWidth * index + 'px'; // style给css赋值一定一定一定是字符串的格式，需要加上单位
+        }
+        index--;
+        /*
+            第一张图片：left: 0px  -> index = 0, 容器宽度为800，left = index * -容器宽度
+            第二张图片：left: -800px  -> index = 1, 容器宽度为800，left = index * -容器宽度
+            第三张图片：left: -1600px  -> index = 2, 容器宽度为800，left = index * -容器宽度
+            第四张图片：left: -2400px  -> index = 3, 容器宽度为800，left = index * -容器宽度
+            第五张图片：left: -3200px  -> index = 4, 容器宽度为800，left = index * -容器宽度
+        */
+        animateMove(pic, -pic.parentNode.offsetWidth * index);
+    }
+    arrowRight.onclick = function () {
+        if (index == pic.children.length - 1) {
+            // 让图片元素回到最初位置
+            index = 0;
+            pic.style.left = '0px';
+        }
+        index++;
+        /*
+            第一张图片：left: 0px  -> index = 0, 容器宽度为800，left = index * -容器宽度
+            第二张图片：left: -800px  -> index = 1, 容器宽度为800，left = index * -容器宽度
+            第三张图片：left: -1600px  -> index = 2, 容器宽度为800，left = index * -容器宽度
+            第四张图片：left: -2400px  -> index = 3, 容器宽度为800，left = index * -容器宽度
+            第五张图片：left: -3200px  -> index = 4, 容器宽度为800，left = index * -容器宽度
+        */
+        animateMove(pic, -pic.parentNode.offsetWidth * index);
+    }
+
+    // 4. 页码注册点击事件
+    for (let i = 0; i < lis.length; i++) {
+        lis[i].onclick = function () {
+            index = parseInt(this.innerHTML) - 1;
+            for (let j = 0; j < lis.length; j++) {
+                lis[j].className = '';
+            }
+            this.className = 'active';
+            animateMove(pic, -pic.parentNode.offsetWidth * index);
+        }
+    }
+
+    // 5. 无限轮播的思想
+    /*
+        常规思想，当显示最后一张图片的时候，点击向右按钮，立刻悄悄的将图片的pic对象重置到left=0的位置
+        存在问题：
+            1. 第一张图片会被跳过，因为当index=0之后，紧接着会运行index++，所以会把第一张图片跳过
+            2. 突然改变pic的left值，会导致图片闪动效果
+        解决方案：在图片序列中增加一张图片
+        思路：因为最后一张图片和第一张图片是同一张图片，所以视觉上看不到闪动的效果，同时，又不会把第一张照片跳过
+    */
+
+    // 6. 自动轮播
+    var nextPic = function () {
+        // 6.1 将 index + 1
+        if (index == pic.children.length - 1) {
+            index = 0;
+            pic.style.left = '0px';
+        }
+        // else { 为什么 else 去掉就可以了呢？
+        index++;
+        // }
+        animateMove(pic, -pic.parentNode.offsetWidth * index);
+        page();
+    }
+
+    // 7. 页码保持同步（当前显示的是第几张图片，下方页码对应索引高亮）
+    var page = function () {
+        for (let i = 0; i < lis.length; i++) {
+            lis[i].className = '';
+        }
+        if (index == pic.children.length - 1) {
+            lis[0].className = 'active';
+        } else {
+            lis[index].className = 'active';
+        }
+    }
+
+</script>
+
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>导航条</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            border: none;
+            box-sizing: border-box;
+            font-family: 'Microsoft Yahei';
+            font-size: 62.5%;
+            color: #ffffff;
+        }
+
+        header {
+            height: 80px;
+            background-color: #333333;
+            border-bottom: 5px solid #e15671;
+        }
+
+        header>nav {
+            position: relative;
+            width: 1000px;
+            height: 80px;
+            margin: 0 auto;
+            line-height: 80px;
+        }
+
+        header>nav>div {
+            position: absolute;
+            z-index: 0;
+            height: 80px;
+            background-color: #e15671;
+        }
+
+        header>nav>a {
+            position: relative;
+            z-index: 1;
+            font-size: 2.4rem;
+            text-decoration: none;
+            padding: 0 50px;
+            float: left;
+        }
+    </style>
+    <script type="text/javascript" src="animation.js"></script>
+    <script type="text/javascript">
+        window.onload = function () {
+            /*
+                需求：用一个可以移动的盒子来表示导航链接的选中状态
+                    1. 鼠标经过某一个链接，让表示选中状态的盒子移动到当前链接
+                    2. 鼠标离开某一个链接，让表示选中状态的盒子回之前的位置
+                    3. 鼠标点击某一个链接，该链接变成选中状态
+            */
+
+            // 获取元素
+            var links = document.querySelectorAll('a');
+            var div = document.querySelector('div');
+
+            // 初始化
+            div.style.width = links[0].offsetWidth + 'px';
+            var yuanlaide = div.offsetLeft;
+
+            // 给所有的链接注册事件
+            for (let i = 0; i < links.length; i++) {
+                // 1. 鼠标经过某一个链接，让表示选中状态的盒子移动到当前链接
+                links[i].onmouseover = function() {
+                    animateMove(div, this.offsetLeft, div.offsetTop, 10);
+                }
+                // 2. 鼠标离开某一个链接，让表示选中状态的盒子回之前的位置
+                links[i].onmouseout = function() {
+                    animateMove(div, yuanlaide, div.offsetTop, 10);
+                }
+                // 3. 鼠标点击某一个链接，该链接变成选中状态
+                links[i].onclick = function() {
+                    yuanlaide = this.offsetLeft;
+                }
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <header>
+        <nav>
+            <div></div>
+            <a href="#">网站首页</a>
+            <a href="#">关于我们</a>
+            <a href="#">公司简介</a>
+            <a href="#">成功案例</a>
+            <a href="#">联系我们</a>
+        </nav>
+    </header>
+</body>
+
+</html>
